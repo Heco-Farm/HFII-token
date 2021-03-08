@@ -859,69 +859,10 @@ contract ERC20 is Context, IERC20 {
 }
 
 
-/**
- * @dev Extension of {ERC20} that allows token holders to destroy both their own
- * tokens and those that they have an allowance for, in a way that can be
- * recognized off-chain (via event analysis).
- */
-abstract contract ERC20Burnable is Context, ERC20 {
-    /**
-     * @dev Destroys `amount` tokens from the caller.
-     *
-     * See {ERC20-_burn}.
-     */
-    function burn(uint256 amount) public virtual {
-        _burn(_msgSender(), amount);
-    }
 
-    /**
-     * @dev Destroys `amount` tokens from `account`, deducting from the caller's
-     * allowance.
-     *
-     * See {ERC20-_burn} and {ERC20-allowance}.
-     *
-     * Requirements:
-     *
-     * - the caller must have allowance for ``accounts``'s tokens of at least
-     * `amount`.
-     */
-    function burnFrom(address account, uint256 amount) public virtual {
-        uint256 decreasedAllowance = allowance(account, _msgSender()).sub(amount, "ERC20: burn amount exceeds allowance");
-
-        _approve(account, _msgSender(), decreasedAllowance);
-        _burn(account, amount);
-    }
-}
-
-
-contract token is ERC20Burnable, Operator {
+contract token is  Context, ERC20, Operator {
     constructor() public ERC20('HFII', 'HFII') {
-        _mint(msg.sender, 10000 * 10**18);
+        _mint(msg.sender, 80000 * 10**18);
     }
 
-    function mint(address recipient_, uint256 amount_)
-        public
-        onlyOperator
-        returns (bool)
-    {
-        uint256 balanceBefore = balanceOf(recipient_);
-        _mint(recipient_, amount_);
-        uint256 balanceAfter = balanceOf(recipient_);
-        return balanceAfter >= balanceBefore;
-    }
-
-    function burn(uint256 amount) public override onlyOperator {
-        super.burn(amount);
-    }
-
-    function burnFrom(address account, uint256 amount)
-        public
-        override
-        onlyOperator
-    {
-        super.burnFrom(account, amount);
-    }
 }
-
-
-
